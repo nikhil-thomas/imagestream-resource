@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io
+kind: ClusterRolebinding
+metadata:
+  name: imagestream-resource
+subjects:
+  - kind: ServiceAccount
+    name: imagestream-resource-controller
+    namespace: openshift-pipelines
+roleRef:
+  kind: ClusterRole
+  name: imagestream-resource
+  apiGroup: rbac.authorization.k8s.io

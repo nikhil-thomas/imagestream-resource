@@ -1,0 +1,6 @@
+apiVersion: v1alpha1
+kind: ImageStreamResource
+metadata:
+  name: my-app-image
+  namespace: my-namespace
+spec:
