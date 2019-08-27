@@ -69,6 +69,5 @@ type Variables struct {
 type ImagestreamResourceList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
-
-	Items []ImagestreamResource `json:"items"`
+	Items           []ImagestreamResource `json:"items"`
 }

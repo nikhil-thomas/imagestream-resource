@@ -6,7 +6,7 @@ spec:
   group: openshift.tekton.dev
   version: v1alpha1
   names:
-    kind: ImageStreamResource
+    kind: ImagestreamResource
     plural: imagestreamresources
     singular: imagestreamresource
     categories:

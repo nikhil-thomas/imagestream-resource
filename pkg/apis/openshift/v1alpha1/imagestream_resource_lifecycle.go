@@ -9,7 +9,7 @@ var condSet = apis.NewLivingConditionSet()
 
 // GetGroupVersionKind implements kmeta.OwnerRefable
 func (isr *ImagestreamResource) GetGroupVersionKind() schema.GroupVersionKind {
-	return SchemaGroupVersion.WithKind("ImagestreamResource")
+	return SchemeGroupVersion.WithKind("ImagestreamResource")
 }
 
 func (isrs *ImagestreamResourceStatus) InitializeContditions() {

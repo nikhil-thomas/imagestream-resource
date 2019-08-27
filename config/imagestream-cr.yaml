@@ -1,6 +1,7 @@
-apiVersion: v1alpha1
-kind: ImageStreamResource
+apiVersion: openshift.tekton.dev/v1alpha1
+kind: ImagestreamResource
 metadata:
   name: my-app-image
-  namespace: my-namespace
+  namespace: openshift-pipelines
 spec:
+  imageName: nginx:latest

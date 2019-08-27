@@ -38,5 +38,5 @@ ${KNATIVE_CODEGEN_PKG}/hack/generate-knative.sh "injection" \
   "openshift:v1alpha1" \
   --go-header-file ${REPO_ROOT}/hack/boilerplate/boilerplate.go.txt
 
-## Make sure our dependencies are up-to-date
-#${REPO_ROOT}/hack/update-deps.sh
+# Make sure our dependencies are up-to-date
+${REPO_ROOT}/hack/update-deps.sh
