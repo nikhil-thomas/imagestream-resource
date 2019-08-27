@@ -1,13 +1,14 @@
 package v1alpha1
 
 import (
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"knative.dev/pkg/apis"
+	duckv1beta1 "knative.dev/pkg/apis/duck/v1beta1"
 	"knative.dev/pkg/kmeta"
 )
 
-// +genClient
+// +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // ImagestreamResource is duck-typed Tekton Pipeline Resource
@@ -38,18 +39,36 @@ var _ apis.Validatable = (*ImagestreamResource)(nil)
 var _ apis.Defaultable = (*ImagestreamResource)(nil)
 var _ kmeta.OwnerRefable = (*ImagestreamResource)(nil)
 
+// ImagestreamResourceSpec holds the image url, name, tag/digest of the
+// container image which has to be imported/tracked as an image stream
+// (NT: aug 23 2019): this assumption can change
 type ImagestreamResourceSpec struct {
-	ImageName string
+	ImageName string `json:"imagename"`
 }
 
+// ImagestreamResourceStatus holds the PipelineExtensibility Contract
+// so that ImagestreamResource can be used as a PipelineResource by Tekton-Pipelines
 type ImagestreamResourceStatus struct {
-	Conditions       apis.Conditions `json:"conditions"`
-	beforecontainers []corev1.Container
-	aftercontainers  []corev1.Container
-	variables Variables
+	duckv1beta1.Status `json:",inline"`
+	Conditions         apis.Conditions    `json:"conditions"`
+	Beforecontainers   []corev1.Container `json:"beforeContainers"`
+	Aftercontainers    []corev1.Container `json:"afterContainers"`
+	Variables          Variables          `json:"variables"`
 }
 
+// Variables are list of key value pairs which can be
+// used by consuming controller for value substitution
 type Variables struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`
+}
+
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+
+// ImagestreamResourceList is a list of ImagestreamResource resources
+type ImagestreamResourceList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata"`
+
+	Items []ImagestreamResource `json:"items"`
 }
