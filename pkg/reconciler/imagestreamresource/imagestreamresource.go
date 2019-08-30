@@ -46,12 +46,14 @@ var _ controller.Reconciler = (*Reconciler)(nil)
 
 func (r *Reconciler) Reconcile(ctx context.Context, key string) error {
 	logger := logging.FromContext(ctx)
+	logger.Infof("-----------: reconcile start key: %s :--------------", key)
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		logger.Errorf("invalid resource key: %s", key)
 		return nil
 	}
 
+	logger.Infof("---------: ns: %s, name: %s :----------", namespace, name)
 	// Get the resource with namespaced name
 	original, err := r.Lister.ImagestreamResources(namespace).Get(name)
 	if apierrs.IsNotFound(err) {
@@ -60,6 +62,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, key string) error {
 	} else if err != nil {
 		return err
 	}
+	logger.Info("reconcile isr fetched start")
 
 	resource := original.DeepCopy()
 
@@ -70,6 +73,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, key string) error {
 		// This is important because the copy we loaded from the informer's
 		// cache may be stale and we don't want to overwrite a prior update
 		// to status with this stale state.
+		logger.Info("reconcile equality")
 	} else if _, err = r.updateStatus(resource); err != nil {
 		logger.Warnw("Failed to update resource status", zap.Error(err))
 		r.Recorder.Eventf(resource, corev1.EventTypeWarning, "UpdateFailed",
@@ -84,6 +88,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, key string) error {
 			"InternalError",
 			reconcileErr.Error())
 	}
+	logger.Info("reconcile return reconcile err")
 
 	return reconcileErr
 }
