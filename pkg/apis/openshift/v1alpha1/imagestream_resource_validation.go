@@ -13,8 +13,8 @@ func (isr *ImagestreamResource) Validate(ctx context.Context) *apis.FieldError {
 
 // Validate implements apis.Validate
 func (isrsp *ImagestreamResourceSpec) Validate(ctx context.Context) *apis.FieldError {
-	if isrsp.ImageName == "" {
-		return apis.ErrMissingField("imageName")
+	if isrsp.Name == "" {
+		return apis.ErrMissingField("name")
 	}
 	return nil
 }

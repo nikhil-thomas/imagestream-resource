@@ -4,4 +4,7 @@ metadata:
   name: my-app-image
   namespace: openshift-pipelines
 spec:
-  imageName: nginx:latest
+  Name: my-imagestream
+  params:
+    name: foo
+    value: bar

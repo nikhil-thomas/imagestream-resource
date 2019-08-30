@@ -43,7 +43,8 @@ var _ kmeta.OwnerRefable = (*ImagestreamResource)(nil)
 // container image which has to be imported/tracked as an image stream
 // (NT: aug 23 2019): this assumption can change
 type ImagestreamResourceSpec struct {
-	ImageName string `json:"imagename"`
+	Name   string  `json:"name"`
+	Params []Param `json:"params"`
 }
 
 // ImagestreamResourceStatus holds the PipelineExtensibility Contract
@@ -53,12 +54,13 @@ type ImagestreamResourceStatus struct {
 	Conditions         apis.Conditions    `json:"conditions"`
 	Beforecontainers   []corev1.Container `json:"beforeContainers"`
 	Aftercontainers    []corev1.Container `json:"afterContainers"`
-	Variables          Variables          `json:"variables"`
+	Params             []Param            `json:"params"`
 }
 
-// Variables are list of key value pairs which can be
+// Param are key value pair which can be
 // used by consuming controller for value substitution
-type Variables struct {
+// Param declares a value to use for the Param called Name.
+type Param struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`
 }
