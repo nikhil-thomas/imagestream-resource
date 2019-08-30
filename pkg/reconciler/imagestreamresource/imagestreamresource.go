@@ -24,6 +24,8 @@ import (
 	"knative.dev/pkg/controller"
 )
 
+const os4Registry = "image-registry.openshift-image-registry.svc:5000"
+
 // Reconciler implements controller.Reconciler for AddressableService resources
 type Reconciler struct {
 	// Client is used to write status updates
@@ -46,11 +48,13 @@ var _ controller.Reconciler = (*Reconciler)(nil)
 
 func (r *Reconciler) Reconcile(ctx context.Context, key string) error {
 	logger := logging.FromContext(ctx)
+	logger.Infof(":::::::::::::::::::: key: %s \n", key)
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		logger.Errorf("invalid resource key: %s", key)
 		return nil
 	}
+	logger.Infof(":::::::::::::::::::: ns: %s name: %s", namespace, name)
 
 	// Get the resource with namespaced name
 	original, err := r.Lister.ImagestreamResources(namespace).Get(name)
@@ -60,6 +64,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, key string) error {
 	} else if err != nil {
 		return err
 	}
+	logger.Info("reconcile isr fetched start")
 
 	resource := original.DeepCopy()
 
@@ -70,6 +75,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, key string) error {
 		// This is important because the copy we loaded from the informer's
 		// cache may be stale and we don't want to overwrite a prior update
 		// to status with this stale state.
+		logger.Info("reconcile equality")
 	} else if _, err = r.updateStatus(resource); err != nil {
 		logger.Warnw("Failed to update resource status", zap.Error(err))
 		r.Recorder.Eventf(resource, corev1.EventTypeWarning, "UpdateFailed",
@@ -84,6 +90,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, key string) error {
 			"InternalError",
 			reconcileErr.Error())
 	}
+	logger.Info("reconcile return reconcile err")
 
 	return reconcileErr
 }
@@ -104,7 +111,13 @@ func (r *Reconciler) reconcile(ctx context.Context, isr *v1alpha1.ImagestreamRes
 
 func (r *Reconciler) reconcileImagestreamResource(ctx context.Context, resource *v1alpha1.ImagestreamResource) error {
 	logger := logging.FromContext(ctx)
-	logger.Info("reconciling imagestream resource")
+
+	imageStrName := resource.Spec.Name
+	logger.Infof("Imagestream name : %s", imageStrName)
+	imageStrParams := resource.Spec.Params
+	logger.Infof("ImagestreamRsc param val : %s", imageStrParams[0].Name)
+	logger.Infof("ImagestreamRsc param name : %s", imageStrParams[0].Value)
+
 	return nil
 }
 

@@ -16,7 +16,7 @@ import (
 type ImagestreamResource struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
-	metav1.ObjectMeta `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Spec holds the image url, name, tag/digest of the
 	// container image which has to be imported/tracked as an image stream

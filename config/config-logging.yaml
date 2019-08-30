@@ -9,7 +9,7 @@ metadata:
 data:
   zap-logger-config: |
     {
-      "level": "info",
+      "level": "debug",
       "development": false,
       "outputPaths": ["stdout"],
       "errorOutputPaths": ["stderr"],

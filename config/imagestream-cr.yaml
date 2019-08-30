@@ -6,5 +6,5 @@ metadata:
 spec:
   Name: my-imagestream
   params:
-    name: foo
+  - name: foo
     value: bar
