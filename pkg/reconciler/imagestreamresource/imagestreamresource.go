@@ -2,7 +2,9 @@ package imagestreamresource
 
 import (
 	"context"
+	"os"
 	"reflect"
+	"strings"
 
 	"knative.dev/pkg/tracker"
 
@@ -19,12 +21,11 @@ import (
 
 	clientset "github.com/openshift/imagestream-resource/pkg/client/clientset/versioned"
 	listers "github.com/openshift/imagestream-resource/pkg/client/listers/openshift/v1alpha1"
+	pipelinev1alpha1 "github.com/tektoncd/pipeline/pkg/apis/pipeline/v1alpha1"
 	apierrs "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/client-go/tools/record"
 	"knative.dev/pkg/controller"
 )
-
-const os4Registry = "image-registry.openshift-image-registry.svc:5000"
 
 // Reconciler implements controller.Reconciler for AddressableService resources
 type Reconciler struct {
@@ -48,15 +49,12 @@ var _ controller.Reconciler = (*Reconciler)(nil)
 
 func (r *Reconciler) Reconcile(ctx context.Context, key string) error {
 	logger := logging.FromContext(ctx)
-	logger.Infof(":::::::::::::::::::: key: %s \n", key)
+	logger.Infof("key: %s \n", key)
 	namespace, name, err := cache.SplitMetaNamespaceKey(key)
 	if err != nil {
 		logger.Errorf("invalid resource key: %s", key)
 		return nil
 	}
-	logger.Infof(":::::::::::::::::::: ns: %s name: %s", namespace, name)
-
-	// Get the resource with namespaced name
 	original, err := r.Lister.ImagestreamResources(namespace).Get(name)
 	if apierrs.IsNotFound(err) {
 		logger.Errorf("resource %q no longer exists", key)
@@ -64,7 +62,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, key string) error {
 	} else if err != nil {
 		return err
 	}
-	logger.Info("reconcile isr fetched start")
+	logger.Info("reconcile isr fetched")
 
 	resource := original.DeepCopy()
 
@@ -89,9 +87,9 @@ func (r *Reconciler) Reconcile(ctx context.Context, key string) error {
 			corev1.EventTypeWarning,
 			"InternalError",
 			reconcileErr.Error())
+		logger.Errorf("reconcile error :%v:", err)
 	}
-	logger.Info("reconcile return reconcile err")
-
+	logger.Info("reconcile return err: nil")
 	return reconcileErr
 }
 
@@ -112,12 +110,29 @@ func (r *Reconciler) reconcile(ctx context.Context, isr *v1alpha1.ImagestreamRes
 func (r *Reconciler) reconcileImagestreamResource(ctx context.Context, resource *v1alpha1.ImagestreamResource) error {
 	logger := logging.FromContext(ctx)
 
-	imageStrName := resource.Spec.Name
-	logger.Infof("Imagestream name : %s", imageStrName)
-	imageStrParams := resource.Spec.Params
-	logger.Infof("ImagestreamRsc param val : %s", imageStrParams[0].Name)
-	logger.Infof("ImagestreamRsc param name : %s", imageStrParams[0].Value)
+	registryRoute := os.Getenv("OPENSHIFT_IMAGE_REGISTRY")
 
+	imageStrURL := registryRoute + "/" + resource.Spec.Namespace
+	imageStrURL += "/" + resource.Spec.Name
+	logger.Infof("Imagestream URL : %s", imageStrURL)
+
+	statusParam := pipelinev1alpha1.ResourceParam{
+		Name:  "url",
+		Value: imageStrURL,
+	}
+	index := -1
+
+	for i, rscPrm := range resource.Status.Variables {
+		if strings.EqualFold(rscPrm.Name, "URL") {
+			index = i
+			break
+		}
+	}
+	if index >= 0 {
+		resource.Status.Variables = append(resource.Status.Variables[:index], resource.Status.Variables[index+1:]...)
+	}
+
+	resource.Status.Variables = append(resource.Status.Variables, statusParam)
 	return nil
 }
 

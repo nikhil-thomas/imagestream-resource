@@ -2,9 +2,10 @@ apiVersion: openshift.tekton.dev/v1alpha1
 kind: ImagestreamResource
 metadata:
   name: my-app-image
-  namespace: openshift-pipelines
+  namespace: openshift-pipelines #namespace of image stream resource
 spec:
   name: my-imagestream
+  namespace:  shared-namespace #namespace of imagestream, defaults to metadata.namespace
   params:
   - name: foo
     value: bar

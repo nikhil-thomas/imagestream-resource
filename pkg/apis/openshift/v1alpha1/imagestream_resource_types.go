@@ -1,6 +1,7 @@
 package v1alpha1
 
 import (
+	pipelinev1alpha1 "github.com/tektoncd/pipeline/pkg/apis/pipeline/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"knative.dev/pkg/apis"
@@ -43,26 +44,21 @@ var _ kmeta.OwnerRefable = (*ImagestreamResource)(nil)
 // container image which has to be imported/tracked as an image stream
 // (NT: aug 23 2019): this assumption can change
 type ImagestreamResourceSpec struct {
-	Name   string  `json:"name"`
-	Params []Param `json:"params"`
+	Name      string                           `json:"name"`
+	Namespace string                           `json:"namespace"`
+	Params    []pipelinev1alpha1.ResourceParam `json:"params"`
 }
 
 // ImagestreamResourceStatus holds the PipelineExtensibility Contract
 // so that ImagestreamResource can be used as a PipelineResource by Tekton-Pipelines
+// Field names are chosen based on the `Tekton Pipeline Resource Extensibility` proposal
 type ImagestreamResourceStatus struct {
 	duckv1beta1.Status `json:",inline"`
-	Conditions         apis.Conditions    `json:"conditions"`
-	Beforecontainers   []corev1.Container `json:"beforeContainers"`
-	Aftercontainers    []corev1.Container `json:"afterContainers"`
-	Params             []Param            `json:"params"`
-}
-
-// Param are key value pair which can be
-// used by consuming controller for value substitution
-// Param declares a value to use for the Param called Name.
-type Param struct {
-	Name  string `json:"name"`
-	Value string `json:"value"`
+	Conditions         apis.Conditions                  `json:"conditions"`
+	Beforecontainers   []corev1.Container               `json:"beforeContainers"`
+	Aftercontainers    []corev1.Container               `json:"afterContainers"`
+	Volumes            []corev1.Volume                  `json:"volumes"`
+	Variables          []pipelinev1alpha1.ResourceParam `json:"variables"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object

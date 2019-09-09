@@ -5,5 +5,5 @@ import (
 )
 
 func (isr *ImagestreamResource) SetDefaults(ctx context.Context) {
-	// Nothing to Default
+	isr.Spec.Namespace = isr.ObjectMeta.Namespace
 }

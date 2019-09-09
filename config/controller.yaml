@@ -26,6 +26,8 @@ spec:
             - name: config-logging
               mountPath: /etc/config-logging
           env:
+            - name: OPENSHIFT_IMAGE_REGISTRY
+              value: "<openshift-image-registry-url>"
             - name: SYSTEM_NAMESPACE
               valueFrom:
                 fieldRef:
