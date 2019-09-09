@@ -35,7 +35,7 @@ spec:
             - name: CONFIG_OBSERVABILITY_NAME
               value: config-observability
             - name: METRICS_DOMAIN
-              value: knative.dev/samples
+              value: tekton.dev/samples
       volumes:
         - name: config-logging
           configMap:
